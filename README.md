@@ -4,19 +4,21 @@ Here you will find the scripts necessary to produce the scores described in our 
 
 ### Install Prerequisites
 First install git:
-'''javascript
+```javascript
 sudo apt-get install git-all
-'''
+```
 
 Then clone this repository
-'''javascript
+
+```javascript
 git clone https://github.com/Gabaldonlab/nextPARS.git
-'''
+```
 
 Now, ensure the necessary python packages are installed, and can be found in the $PYTHONPATH environment variable by running the script packages_for_nextPARS.sh.
-'''javascript
+
+```javascript
 ./packages_for_nextPARS.sh
-'''
+```
 
 
 
@@ -38,9 +40,9 @@ There are a number of different command line options in the script, many of whic
   * Use the -c option to change the percentile cap for raw values at the beginning of calculations [default = 95]
 
 Example usage:
-'''javascript
+```javascript
 python get_combined_scores.py -i TETp4p6 -s
-'''
+```
 
 
 
@@ -51,9 +53,9 @@ This script counts the number of reads beginning at each position (which indicat
 in .tab format (count values for each position are separated by semi-colons).
 
 Example usage:
-'''javascript
+```javascript
 python tabGenerator.py --bam bam_folder -b bed_file -e exp_name -r reference_organism -d exp_date
-'''
+```
 
 where 
   * --bam gives the directory containing the bam file of interest
