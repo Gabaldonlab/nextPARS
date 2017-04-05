@@ -75,7 +75,12 @@ def repeatIt(bamfolder, name, bed, ref, date, mapQ, minC, v_lev):
                 suffix = "T1"
             elif "_MIX" in bamfolder:
                 suffix = "MIX"
-
+            
+            if not os.path.exists("%s/%s" %(outDir, ref)):
+                os.makedirs("%s/%s" %(outDir, ref))
+            if not os.path.exists("%s/%s/%s" %(outDir, ref, date)):
+                os.makedirs("%s/%s/%s" %(outDir, ref, date))
+        
             t2c = "%s/transcript2count.py" %src
 #            if filename.endswith('Aligned.sortedByCoord.out.bam'):
             command = "python %s -v %s -a %s -b %s -q %s -m %s | cut -f1,3 | sed \"s/$/;/g\" >  %s/%s/%s/%s_%s.tab" %(t2c, v_lev, 
@@ -101,44 +106,44 @@ def repeatIt(bamfolder, name, bed, ref, date, mapQ, minC, v_lev):
                #~
 #    if not os.path.exists("%s/%s/%s" %(outDir, ref, name)):
 #        os.makedirs("%s/%s/%s" %(outDir, ref, name))
-#
-#    # read the temporary file with list of 
-#    fin = open("%s/%s/%s.tab" %(outDir, ref, name), 'r')
-#    for line in fin:
-#
-#        line2 = line.strip()
-#
-#        arr = line2.split("\t")
-#
-#        if "_A_" in bamfolder:
-#            suffix = "A"
-#        elif "control" in bamfolder:
-#            suffix = "NoDig"
-#        elif "Nodig" in bamfolder:
-#            suffix = "NoDig"
-#        elif "NoDigest" in bamfolder:
-#            suffix = "NoDig"
-#        elif "NO_dig" in bamfolder:
-#            suffix = "NoDig"
-#        elif "_S1" in bamfolder or "S1_" in bamfolder:
-#            suffix = "S1"
-#        elif "_V1" in bamfolder or "V1_" in bamfolder:
-#            suffix = "V1"
-#        elif "_T1" in bamfolder:
-#            suffix = "T1"
-#        elif "_MIX" in bamfolder:
-#            suffix = "MIX"
-##        else:
-##            continue
-#
-#
-#
-#
-#        out = open("%s/%s/%s/%s_%s_%s.tab" %(outDir, ref, name, arr[0], name, suffix), 'w')
-#        #~ out = open("/home/dloska/Desktop/RNA/tab/tabsSingle/"  + arr[0] + "_" + name + "_" + suffix + ".tab", 'w')
-#        out.write(line2 + "\n")
-#        out.close()
-#    fin.close()
+
+    # read the temporary file with list of 
+    fin = open("%s/%s/%s/%s_%s.tab" %(outDir, ref, date, name, suffix), 'r')
+    for line in fin:
+
+        line2 = line.strip()
+
+        molecule = line2.split("\t")
+
+        if "_A_" in bamfolder:
+            suffix = "A"
+        elif "control" in bamfolder:
+            suffix = "NoDig"
+        elif "Nodig" in bamfolder:
+            suffix = "NoDig"
+        elif "NoDigest" in bamfolder:
+            suffix = "NoDig"
+        elif "NO_dig" in bamfolder:
+            suffix = "NoDig"
+        elif "_S1" in bamfolder or "S1_" in bamfolder:
+            suffix = "S1"
+        elif "_V1" in bamfolder or "V1_" in bamfolder:
+            suffix = "V1"
+        elif "_T1" in bamfolder:
+            suffix = "T1"
+        elif "_MIX" in bamfolder:
+            suffix = "MIX"
+#        else:
+#            continue
+
+
+
+
+        out = open("%s/%s/%s/%s_%s_%s.tab" %(outDir, ref, date, molecule[0], name, suffix), 'w')
+        #~ out = open("/home/dloska/Desktop/RNA/tab/tabsSingle/"  + arr[0] + "_" + name + "_" + suffix + ".tab", 'w')
+        out.write(line2 + "\n")
+        out.close()
+    fin.close()
     
     
 #    os.system('rm %s/%s/%s.tab' %(outDir, ref, name))

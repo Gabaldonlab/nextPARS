@@ -4,7 +4,7 @@
 #Example of usage:
 #$ python get_combined_score_v1.1.py -i TETp4p6 <options>
 
-import argparse, os, sys
+import argparse, os, sys, glob
 import numpy as np
 import tabscorelib as tsl
 from termcolor import colored
@@ -300,6 +300,10 @@ def get_tabfilelist_nextPARS(molname):
     tabs = []
     for exp in os.listdir('%s/%s' %(data, molname)):
         tabs.append(exp)
+    tabOutputFolder = glob.glob('%s/tabGenerator_outputs/*/*/%s*.tab' %(home, molname))
+    if len(tabOutputFolder) > 0:
+        for exp in glob.glob('%s/tabGenerator_outputs/*/*/%s*.tab' %(home, molname)):
+            tabs.append(exp.split('/')[-1])
     
     tabfilelist = open(molname+'.txt', 'w')
     tabs = sorted(tabs)
