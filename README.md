@@ -34,7 +34,7 @@ There are a number of different command line options in the script, many of whic
   * Use the -i option [REQUIRED] to indicate the molecule for which you want scores (all available data files will be included in the calculations -- molecule name must match that in the data file names)
   * Use the -s option to produce an output Structure Preference Profile (SPP) file. Values for each position are separated by semi-colons. Here 0 = paired position, 1 = unpaired position, and NA = position with a score too low to determine its configuration.
   * Use the -o option to output the calculated scores, again with values for each position separated by semi-colons.
-  * Use the option {-V combined} to produce an output with the scores that is compatible with the structure visualization program [VARNA](http://varna.lri.fr/), (1)
+  * Use the option {-V combined} to produce an output with the scores that is compatible with the structure visualization program [VARNA](http://varna.lri.fr/)<sup>1</sup>
   * Use the option {-V spp} to produce an output with the SPP values that is compatible with VARNA.
   * Use the -t option to change the threshold value for scores when determining SPP values [default = 0.8, or -0.8 for negative scores]
   * Use the -c option to change the percentile cap for raw values at the beginning of calculations [default = 95]
@@ -70,4 +70,4 @@ Also accepts arguments:
 ---
 
 ### References:
-(1) Darty,K., Denise,A. and Ponty,Y. (2009) VARNA: Interactive drawing and editing of the RNA secondary structure. Bioinforma. Oxf. Engl., 25, 1974–197
+1. Darty,K., Denise,A. and Ponty,Y. (2009) VARNA: Interactive drawing and editing of the RNA secondary structure. Bioinforma. Oxf. Engl., 25, 1974–197
