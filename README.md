@@ -28,7 +28,7 @@ There are sample data files found in the folder [nextPARS/data](https://github.c
 
 
 ### nextPARS Scores
-To obtain the scores from nextPARS experiments, use the script [get_combined_scores.py](https://github.com/Gabaldonlab/nextPARS/tree/master/bin/get_combined_scores.py). Sample data for the 5 PDB control structures can be found in the folder nextPARS/data/
+To obtain the scores from nextPARS experiments, use the script [get_combined_score.py](https://github.com/Gabaldonlab/nextPARS/tree/master/bin/get_combined_score.py). Sample data for the 5 PDB control structures can be found in the folder nextPARS/data/
 
 There are a number of different command line options in the script, many of which were experimental or exploratory and are not relevant here. The useful ones in this context are the following:
   * Use the -i option [REQUIRED] to indicate the molecule for which you want scores (all available data files will be included in the calculations -- molecule name must match that in the data file names)
@@ -41,7 +41,7 @@ There are a number of different command line options in the script, many of whic
 
 Example usage:
 ```bash
-python get_combined_scores.py -i TETp4p6 -s
+python get_combined_score.py -i TETp4p6 -s
 ```
 
 
