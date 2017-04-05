@@ -14,7 +14,7 @@ Then clone this repository
 git clone https://github.com/Gabaldonlab/nextPARS.git
 ```
 
-Now, ensure the necessary python packages are installed, and can be found in the $PYTHONPATH environment variable by running the script packages_for_nextPARS.sh.
+Now, ensure the necessary python packages are installed, and can be found in the `$PYTHONPATH` environment variable by running the script packages_for_nextPARS.sh.
 
 ```bash
 ./packages_for_nextPARS.sh
@@ -23,12 +23,12 @@ Now, ensure the necessary python packages are installed, and can be found in the
 
 
 ### Sample Data
-There are sample data files found in the folder nextPARS/data, as well as the necessary fasta files in nextPARS/data/SEQS/PROBES, and the reference structures obtained from PDB in nextPARS/data/STRUCTURES/REFERENCE_STRUCTURES
+There are sample data files found in the folder [nextPARS/data](https://github.com/Gabaldonlab/nextPARS/data), as well as the necessary fasta files in [nextPARS/data/SEQS/PROBES](https://github.com/Gabaldonlab/nextPARS/data/SEQS/PROBES), and the reference structures obtained from PDB in [nextPARS/data/STRUCTURES/REFERENCE_STRUCTURES](https://github.com/Gabaldonlab/nextPARS/data/STRUCTURES/REFERENCE_STRUCTURES)
 
 
 
 ### nextPARS Scores
-To obtain the scores from nextPARS experiments, use the script get_combined_scores.py. Sample data for the 5 PDB control structures can be found in the folder nextPARS/data/
+To obtain the scores from nextPARS experiments, use the script [get_combined_scores.py](https://github.com/Gabaldonlab/nextPARS/bin/get_combined_scores.py). Sample data for the 5 PDB control structures can be found in the folder nextPARS/data/
 
 There are a number of different command line options in the script, many of which were experimental or exploratory and are not relevant here. The useful ones in this context are the following:
   * Use the -i option [REQUIRED] to indicate the molecule for which you want scores (all available data files will be included in the calculations -- molecule name must match that in the data file names)
@@ -48,9 +48,8 @@ python get_combined_scores.py -i TETp4p6 -s
 
 ### Convert fastq to tab
 In order to go from the fastq outputs of the nextPARS experiments to a format that allows us to calculate scores, first map the reads in the fastq files to a reference using the program of your choice.
-Once you have obtained a bam file, use the script tabGenerator.py.
-This script counts the number of reads beginning at each position (which indicates a cut site for the enzyme in the file name) and outputs it 
-in .tab format (count values for each position are separated by semi-colons).
+Once you have obtained a bam file, use the script [tabGenerator.py](https://github.com/Gabaldonlab/nextPARS/bin/tabGenerator.py).
+This script counts the number of reads beginning at each position (which indicates a cut site for the enzyme in the file name) and outputs it in .tab format (count values for each position are separated by semi-colons).
 
 Example usage:
 ```bash
