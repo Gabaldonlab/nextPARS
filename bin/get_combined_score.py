@@ -4,18 +4,13 @@
 #Example of usage:
 #$ python get_combined_score_v1.1.py -i TETp4p6 <options>
 
-import argparse, os, sys, glob
+import argparse, os, sys#, glob
 import numpy as np
 import tabscorelib as tsl
 from termcolor import colored
 
 
 # global variables
-#home = '/home/jwillis/users/tg'
-#home = '/users/tg'
-#data = '%s/jwillis/lncRNA_DATA' %home
-#src  = '%s/jwillis/lncRNA_DATA/RNA2D' %home
-
 home = '/'.join(os.path.dirname(os.path.realpath(__file__)).split('/')[:-1])
 data = '%s/data' %home
 src = '%s/bin' %home
@@ -225,12 +220,12 @@ def get_tabfilelist(molname):
     '''Write list of tab file names to file to be read by function tsl.fileList() and 
        return molname_full and real_path (path used for opening file with function tsl.readtabfile()'''
     
-    PATHS = ['%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR61_bedR61' %home,
-             '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/candida' %home,
-             '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/human' %home,
-             '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/c_elegans' %home,
-             '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR62_bedR62' %home,
-             '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR62_bedR61' %home]
+    PATHS = ['/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR61_bedR61',
+             '/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/candida',
+             '/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/human',
+             '/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/c_elegans',
+             '/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR62_bedR62',
+             '/users/tg/tgabaldon/PROJECTS/NONCODEVOL/DATA/TAB_FILES/our_data/refR62_bedR61']
 
     if molname.startswith('RDN'):
         final_concs = ['2014-04-29a','2014-04-29b','2014-04-29c','2014-04-29d']
@@ -289,29 +284,119 @@ def get_tabfilelist(molname):
         tabfilelist.write(t+'\n')
     tabfilelist.close()
     
-    return molname_full, real_path
+    return molname_full, real_path, None, None #None's are for tabfile names..wont be used in this case
 #####################################################################################
-def get_tabfilelist_nextPARS(molname):
+def get_tabfilelist_nextPARS(molname, exp_dir=None):
     '''Write list of tab file names to file to be read by function tsl.fileList() and 
        return molname_full and real_path (path used for opening file with function tsl.readtabfile()'''
     
     molname_full = molname
     
-    tabs = []
-    for exp in os.listdir('%s/%s' %(data, molname)):
-        tabs.append(exp)
-    tabOutputFolder = glob.glob('%s/tabGenerator_outputs/*/*/%s*.tab' %(home, molname))
-    if len(tabOutputFolder) > 0:
-        for exp in glob.glob('%s/tabGenerator_outputs/*/*/%s*.tab' %(home, molname)):
-            tabs.append(exp.split('/')[-1])
+    if molname in ['TETp4p6', 'RDN5-1', 'RDN18-1', 'RDN25-1', 'RDN58-1']:
+        tabs = []
+        for exp in os.listdir('%s/%s' %(data, molname)):
+            tabs.append(exp)
+
+#        tabOutputFolder = glob.glob('%s/%s/%s*.tab' %(data, molname, molname))
+#        if len(tabOutputFolder) > 0:
+#            for exp in tabOutputFolder:
+#                tabs.append(exp.split('/')[-1])
+        
+        tabfilelist = open(molname+'.txt', 'w')
+        tabs = sorted(tabs)
+        for t in tabs:
+            tabfilelist.write(t+'\n')
+        tabfilelist.close()
+        
+        return molname_full, '%s/%s' %(data, molname), None, None #None's are for tabfile names..wont be used in this case
     
-    tabfilelist = open(molname+'.txt', 'w')
-    tabs = sorted(tabs)
-    for t in tabs:
-        tabfilelist.write(t+'\n')
-    tabfilelist.close()
+    else:
+        V1_tabs, S1_tabs = [], []
+        v_exps, s_exps = [], []
+        
+        # in this case, exp_dir argument should be included and must be a directory containing tab files, so first must check:
+        if os.path.isdir(exp_dir):
+            for exp in sorted(os.listdir(exp_dir)):
+                with open('%s/%s' %(exp_dir, exp)) as opentab:
+                    for l in opentab:
+                        if molname in l:
+                            if "V1" in exp:
+                                V1_tabs.append(l)
+                                v_exps.append(exp)
+                            elif "S1" in exp:
+                                S1_tabs.append(l)
+                                s_exps.append(exp)
+                            else:
+                                print "The tab files should indicate which enzyme was used (V1/S1)"
+                                print "Please rename them accordingly"
+                                exit()
+                            break
+            
+            return V1_tabs, S1_tabs, molname, v_exps, s_exps, None # return None in place of hte variable real_path, which wont be used in this case
+                
+        else:
+            print "If not using one of the provided test molecules as input, please include a path containing files with the given input molecule"
+            print "EX:  $ python get_combined_score.py -i <input molecule> -indir <directory_of_input_files>"
+            exit()
+#####################################################################################
+def readtabfile_nextPARS(tabFile):
+    '''Reads a tab file with the digestion information'''
     
-    return molname_full, '%s/%s' %(data, molname)
+    name, counts = tabFile.split()
+    counts = [ float(x) for x in counts.strip(';').split(';')]
+    
+    return counts, name
+
+#####################################################################################
+def get_enzyme_profiles(flist, oldFileOrganization, tabnames, misalign, exp_indices, PARScalc, capto, last50, 
+                        last50_matches, verbose, molname_full, low_coverage_flag, enz_name, molname, real_path=None):
+    enz=[]
+    included = 0
+    tabcounter = 0
+    for f in flist:
+        if oldFileOrganization:
+            data, filename = tsl.readtabfile(f, real_path, oldFileOrganization)
+        else:
+            if molname in ['TETp4p6', 'RDN5-1', 'RDN18-1', 'RDN25-1', 'RDN58-1']:
+                data, filename = tsl.readtabfile(f, real_path)
+            else:
+                data, filename = readtabfile_nextPARS(f)
+                filename = tabnames[tabcounter] #changing it so that it keeps the enzyme suffix
+                tabcounter += 1
+            
+        if misalign:
+            if exp_indices == 'all_indices':
+                data = data
+            else:
+                data = [data[i] for i in exp_indices]
+#        print data
+        if PARScalc:
+            a = data
+            included += 1
+        else:
+            a, enzmean = tsl.normList_to_average(tsl.cap_to_percentile(data, capto), data, filename, 
+                                               last50, last50_matches, verbose, molname_full)
+    #        a, enzmean = tsl.exclude_underexpressed(tsl.cap_to_percentile(data, capto), filename)
+            if len(a) > 1: #exclude empty lists returned when avg count per site too low
+                included += 1
+        #a=tsl.normList_to_average_log(tsl.cap_to_percentile(data, 90), filename)
+        if len(a)==0:      ##For those files that had mean=0 and thus are discarded.
+            enz = enz
+        elif len(enz)==0:
+            enz = a
+        else:
+            enz = [l+m for l,m in zip(enz,a)]   #Add corresponding values from each enz tab file in list file to be averaged in next step.
+#        print a
+    enz = [x/included for x in enz]   #Average of values from all enz tab files in list file
+#    print colored(enz_name,'red'), enz
+    try:
+        enz_norm = tsl.normList_to1(enz)
+    except ValueError:
+        print colored('Insufficient average coverage in %s experiments' %enz_name,'red',attrs=['bold','underline'])
+        low_coverage_flag = 1
+        enz_norm = []
+    
+    return enz, enz_norm, low_coverage_flag, included
     
 #####################################################################################
 #####################################################################################
@@ -353,6 +438,12 @@ def main():
                         action = 'store',
                         default = None,
                         help = "Input molecule name (EX: TETp4p6)")
+    
+    parser.add_argument('-inDir', '--inDir',
+                        dest = 'inDir',
+                        action = 'store',
+                        default = None,
+                        help = "Directory containing input files for the given molecule")
     
     parser.add_argument('--ignore',
                         dest = 'ignore',
@@ -401,6 +492,12 @@ def main():
                         action = 'store',
                         default = None,
                         help = 'Output file with scores in tab file format.')
+    
+    parser.add_argument('-old', '--oldFileOrganization',
+                        dest = 'oldFileOrganization',
+                        action = 'store_true',
+                        default = False,
+                        help = 'Use old organization of files, in which each transcript is stored in a single file.')
     
     parser.add_argument('-p', '--ppv',
                         dest = 'ppv',
@@ -473,6 +570,8 @@ def main():
 #################### Obtain and manipulate data from V1 and S1 digestion files and real calls file (ref structure) ####################
 
     molname = options.input
+    if options.inDir:
+        exp_dir = options.inDir.strip('/')
     
     ###############################
     #collect digestion data
@@ -481,12 +580,22 @@ def main():
     except IOError:
         real_calls = []  #if no ref structure available
     
-    molname_full, real_path = get_tabfilelist_nextPARS(molname)
+    if options.oldFileOrganization:
+        molname_full, real_path, v_exps, s_exps = get_tabfilelist(molname)
+        V1,S1 = tsl.fileList(molname+'.txt')
+        os.system('rm '+molname+'.txt')
+    else:
+        if molname in ['TETp4p6', 'RDN5-1', 'RDN18-1', 'RDN25-1', 'RDN58-1']:
+            molname_full, real_path, v_exps, s_exps = get_tabfilelist_nextPARS(molname)
+            V1,S1 = tsl.fileList(molname+'.txt')
+            os.system('rm '+molname+'.txt')
+        else:
+            V1, S1, molname_full, v_exps, s_exps, real_path = get_tabfilelist_nextPARS(molname, exp_dir)
+            
     
-    V1,S1 = tsl.fileList(molname+'.txt')
-    os.system('rm '+molname+'.txt')
+    
     ###############################
-
+    
 
     ###############################
     #account for mismatches, gaps, etc
@@ -509,7 +618,7 @@ def main():
             exp_indices, match_in_ref, exp_fill_in, full_ref_seq, full_exp_seq, last50_matches = tsl.align_calls_ignore(molname_full, options.bpnucs, options.verbose, options.last50, knots=ignore)
             #FIXME: this section may now be deprecated, can erase??****
         else:
-            exp_indices, match_in_ref, exp_fill_in, full_ref_seq, full_exp_seq, last50_matches = tsl.align_calls(molname_full, options.verbose, options.last50)        
+            exp_indices, match_in_ref, exp_fill_in, full_ref_seq, full_exp_seq, last50_matches = tsl.align_calls(molname_full, options.verbose, options.last50)
 
     else:
         #TODO: not this...also deprecated??******
@@ -520,75 +629,19 @@ def main():
 
     ####################
     low_coverage_flag = 0
+    
+    # get V1 and S1 profiles
+    if options.verbose:
+        print
+        print colored("Tabfile \t Avg. counts per site", "cyan")
+    V, V_norm, low_coverage_flag, included_v = get_enzyme_profiles(V1, options.oldFileOrganization, v_exps, options.misalign, exp_indices, 
+                                                                   options.PARScalc, options.capto, options.last50, last50_matches, 
+                                                                   options.verbose, molname_full, low_coverage_flag, "V1", molname, real_path)
+    
+    S, S_norm, low_coverage_flag, included_s = get_enzyme_profiles(S1, options.oldFileOrganization, s_exps, options.misalign, exp_indices, 
+                                                                   options.PARScalc, options.capto, options.last50, last50_matches, 
+                                                                   options.verbose, molname_full, low_coverage_flag, "S1", molname, real_path)
 
-    # get V1 profiles
-    V=[]
-    included_v = 0
-    for file in V1:
-        data_V, filename = tsl.readtabfile(file, real_path)
-        if options.misalign:
-            data_V = [data_V[i] for i in exp_indices]
-#        print data_V
-        if options.PARScalc:
-            a = data_V
-            included_v += 1
-        else:
-            a, vmean = tsl.normList_to_average(tsl.cap_to_percentile(data_V, options.capto), data_V, filename, 
-                                               options.last50, last50_matches, options.verbose, molname_full)
-    #        a, vmean = tsl.exclude_underexpressed(tsl.cap_to_percentile(data_V, options.capto), filename)
-            if len(a) > 1: #exclude empty lists returned when avg count per site too low
-                included_v += 1
-        #a=tsl.normList_to_average_log(tsl.cap_to_percentile(data_V, 90), filename)
-        if len(a)==0:      ##For those files that had mean=0 and thus are discarded.
-            V=V
-        elif len(V)==0:
-            V=a
-        else:
-            V=[l+m for l,m in zip(V,a)]   #Add corresponding values from each V1 tab file in list file to be averaged in next step.
-#        print a
-    V=[v/included_v for v in V]   #Average of values from all V1 tab files in list file
-#    print colored('V','red'), V
-    try:
-        V_norm = tsl.normList_to1(V)
-    except ValueError:
-        print colored('Insufficient average coverage in V1 experiments','red',attrs=['bold','underline'])
-        low_coverage_flag = 1
-        
-    
-    ####################
-    # get S1 profiles
-    S=[]
-    included_s = 0
-    for file in S1:
-        data_S, filename = tsl.readtabfile(file, real_path)
-        if options.misalign:
-            data_S = [data_S[i] for i in exp_indices]
-        
-        if options.PARScalc:
-            b = data_S
-            included_s += 1
-        else:
-            b, smean = tsl.normList_to_average(tsl.cap_to_percentile(data_S, options.capto), data_S, filename,
-                                              options.last50, last50_matches, options.verbose, molname_full)
-    #        b, smean = tsl.exclude_underexpressed(tsl.cap_to_percentile(data_S, options.capto), filename)
-            if len(b) > 1: #exclude empty lists returned when avg count per site too low
-                included_s += 1
-        #b=tsl.normList_to_average_log(tsl.cap_to_percentile(data_S, 90), filename)
-        if len(b)==0:     ##For those files that had mean=0 and thus are discarded.
-            S=S
-        elif len(S)==0:
-            S=b
-        else:
-            S=[l+m for l,m in zip(S,b)]   #Add corresponding values from each S1 tab file in list file to be averaged in next step.
-#        print b
-    S=[s/included_s for s in S]   #Average of values from all S1 tab files in list file
-#    print colored('S','red'), S
-    try:
-        S_norm = tsl.normList_to1(S)
-    except ValueError:
-        print colored('Insufficient average coverage in S1 experiments','red',attrs=['bold','underline'])
-        low_coverage_flag = 1
-    
     ####################
     # exit if coverage is too low
     if low_coverage_flag == 1:
@@ -636,8 +689,14 @@ def main():
         zer = []
         f = 0
         z = 0
-        for i in xrange(len(full_ref_seq)):
-            if i in match_in_ref:
+        if full_ref_seq == 'all_indices':
+            seq_len = len(combined)
+            
+        else:
+            seq_len = len(full_ref_seq)
+        
+        for i in xrange(seq_len):
+            if (type(match_in_ref)==list and i in match_in_ref) or match_in_ref == 'all_indices':
                 append_cf(combined[f])
                 f += 1
             elif i in exp_fill_in:
@@ -651,9 +710,11 @@ def main():
         combined = combined_full
     
     if options.verbose:
+        print
         print '%s V1 files and %s S1 files included' %(colored(str(included_v),'cyan'), colored(str(included_s),'cyan'))
         print colored("Combined", 'green'), combined, colored(len(combined), 'cyan')
-        print colored("Real Calls", 'green'), real_calls, colored(len(real_calls), 'cyan')
+        if full_ref_seq != "all_indices": #since these values will all be 0s because no CT file was available
+            print colored("Real Calls", 'green'), real_calls, colored(len(real_calls), 'cyan')
         
         
         
@@ -726,17 +787,18 @@ def main():
             ACC, PPV, sen, fpr, cor, inc, und, correct_x, correct_y, incorrect_x, incorrect_y, undet_x, undet_y = tsl.calculations(real_calls, strict_calls)
             
 
-        if options.verbose:
+        if options.verbose and full_ref_seq != "all_indices": #since these values will all be 0s because no CT file was available
             print colored('ACC', 'green'), '= %f%% of predicted values that are correct' %(ACC)
             print colored('PPV', 'green'), '= %f%% of predicted pairs that are actually in real calls' %(PPV)
             print colored('Correct', 'green'), '= %f%% of predicted values match real calls' %(cor)
-            print correct_y, colored("Correct " + str(len(correct_y)), 'cyan')
-    #        print 'correct indices', correct_x
-    #        print 'incorrect indices', incorrect_x
+#            print correct_y, colored("Correct " + str(len(correct_y)), 'cyan')
+            print colored('  correct indices', 'cyan'), correct_x, colored("%s/%s correct" %(len(correct_x),len(strict_calls)), 'cyan')
             print colored('Incorrect', 'green'), '= %f%% of predicted values match real calls' %(inc)
-            print incorrect_y, colored("Incorrect " + str(len(incorrect_y)), 'cyan')
+#            print incorrect_y, colored("Incorrect " + str(len(incorrect_y)), 'cyan')
+            print colored('  incorrect indices', 'cyan'), incorrect_x, colored("%s/%s incorrect" %(len(incorrect_x),len(strict_calls)), 'cyan')
             print colored('Undetermined', 'green'), '= %f%% of predicted values do not meet given threshold' %(und)
-            print undet_y, colored("Undetermined " + str(len(undet_y)), 'cyan')
+#            print undet_y, colored("Undetermined " + str(len(undet_y)), 'cyan')
+            print colored('  undetermined indices', 'cyan'), undet_x, colored("%s/%s undetermined" %(len(undet_x),len(strict_calls)), 'cyan')
             print colored('Sensitivity', 'green'), '= %f%%' %sen
             print colored('FPR', 'green'), '= %.2f%%' %fpr
 

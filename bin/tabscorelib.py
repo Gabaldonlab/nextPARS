@@ -78,19 +78,21 @@ def fileList(filename, T1_A=False):
         return V1, S1
     
 #####################################################################################
-def readtabfile(filename, path):
+def readtabfile(filename, path, oldFileOrganization=False):
     '''Reads a tab file with the digestion information'''
 
-#    experiment = filename.split('_')[-2] #experiment name, EX: 2014-04-29c
-#    tabfile=open(path+'/'+experiment+'/'+filename,'r')
-    tabfile = open('%s/%s' %(path,filename), 'r')
+    if oldFileOrganization:
+        experiment = filename.split('_')[-2] #experiment name, EX: 2014-04-29c
+        tabfile=open(path+'/'+experiment+'/'+filename,'r')
+    else:
+        tabfile = open('%s/%s' %(path,filename), 'r')
     lines=tabfile.readlines()
     tabfile.close()
 #    print lines, len(lines)
     dat=[]
     test=lines[0].strip().split('\t')   #strip() removes '\n'
 #    print 'test', test
-    dat=map(float,test[1][:-1].split(';')) #[:-1] removes final ';'
+    dat=map(float,test[1].strip(';').split(';'))
 #    print 'dat', dat
     return dat, filename
 #####################################################################################
@@ -385,15 +387,26 @@ def align_calls(molname, verbose, last50):
                 try:
                     fasta_file = open('%s/SEQS/PROBES/%s' %(data,molname), 'r')
                 except IOError: # create fasta file from sequence found in ct structure file if necessary
-                    nucs = ['A', 'C', 'G', 'U', 'T', 'X', 'a', 'c', 'g', 'u', 't', 'x']  #To ensure use of only those lines containing the position and pairing info
-                    ct = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s.ct' %(data,molname), 'r')
-                    ctl = ct.readlines()
-                    ct.close()
-                    seq = [line.split()[1].upper() for line in ctl if not line.startswith('#') and len(line.split())>1 and line.split()[1] in nucs]
-                    fasta_write = open('%s/SEQS/PROBES/%s.fa' %(data,molname), 'w')
-                    fasta_write.write('>%s\n%s' %(molname, ''.join(seq)))
-                    fasta_write.close()
-                    fasta_file = open('%s/SEQS/PROBES/%s.fa' %(data,molname), 'r')
+                    try:
+                        nucs = ['A', 'C', 'G', 'U', 'T', 'X', 'a', 'c', 'g', 'u', 't', 'x']  #To ensure use of only those lines containing the position and pairing info
+                        ct = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s.ct' %(data,molname), 'r')
+                        ctl = ct.readlines()
+                        ct.close()
+                        seq = [line.split()[1].upper() for line in ctl if not line.startswith('#') and len(line.split())>1 and line.split()[1] in nucs]
+                        fasta_write = open('%s/SEQS/PROBES/%s.fa' %(data,molname), 'w')
+                        fasta_write.write('>%s\n%s' %(molname, ''.join(seq)))
+                        fasta_write.close()
+                        fasta_file = open('%s/SEQS/PROBES/%s.fa' %(data,molname), 'r')
+                    except IOError: # when no fasta or ct files available, will simply include all indices
+                        exp_indices = 'all_indices'
+                        match_in_ref = 'all_indices'
+                        exp_fill_in = []
+                        full_ref_seq = 'all_indices'
+                        full_exp_seq = 'all_indices'
+                        last50_matches = 50
+                        
+                        return exp_indices, match_in_ref, exp_fill_in, full_ref_seq, full_exp_seq, last50_matches
+                        
                                 
         full_exp_seq = [line.strip() for line in fasta_file.readlines() if not line.startswith('>')]
         fasta_file.close()
