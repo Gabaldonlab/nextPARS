@@ -5,7 +5,7 @@ export PYTHONPATH="$cwd/bin:$PYTHONPATH"
 
 
 ## Install pip for python packages
-sudo apt-get install -y python-pip
+sudo apt-get install python-pip
 
 
 ## To install the required python packages
