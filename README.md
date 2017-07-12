@@ -8,11 +8,6 @@ First install git:
 sudo apt-get install git-all
 ```
 
-And pip for python packages
-```bash
-sudo apt-get install python-pip
-```
-
 Then clone this repository
 
 ```bash
@@ -23,6 +18,7 @@ Now, ensure the necessary python packages are installed, and can be found in the
 
 ```bash
 cd nextPARS
+chmod 775 packages_for_nextPARS.sh
 ./packages_for_nextPARS.sh
 ```
 
