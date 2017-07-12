@@ -1,6 +1,6 @@
 ## To install the required python packages
 
-pip install --user argparse numpy biopython datetime pysam termcolor gzip
+pip install --user argparse numpy biopython datetime pysam termcolor
 
 
 
