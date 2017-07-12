@@ -8,6 +8,11 @@ First install git:
 sudo apt-get install git-all
 ```
 
+And pip for python packages
+```bash
+sudo apt-get install python-pip
+```
+
 Then clone this repository
 
 ```bash
@@ -46,7 +51,7 @@ python get_combined_score.py -i TETp4p6 -s
 
 
 
-### Convert fastq to tab
+### Convert fastq to tab [ *** Currently under maintenance *** ]
 In order to go from the fastq outputs of the nextPARS experiments to a format that allows us to calculate scores, first map the reads in the fastq files to a reference using the program of your choice.
 Once you have obtained a bam file, use the script [tabGenerator.py](https://github.com/Gabaldonlab/nextPARS/tree/master/bin/tabGenerator.py).
 This script counts the number of reads beginning at each position (which indicates a cut site for the enzyme in the file name) and outputs it in .tab format (count values for each position are separated by semi-colons).
