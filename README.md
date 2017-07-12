@@ -19,9 +19,10 @@ Then clone this repository
 git clone https://github.com/Gabaldonlab/nextPARS.git
 ```
 
-Now, ensure the necessary python packages are installed, and can be found in the `$PYTHONPATH` environment variable by running the script packages_for_nextPARS.sh.
+Now, ensure the necessary python packages are installed, and can be found in the `$PYTHONPATH` environment variable by running the script packages_for_nextPARS.sh in the nextPARS directory.
 
 ```bash
+cd nextPARS
 ./packages_for_nextPARS.sh
 ```
 
