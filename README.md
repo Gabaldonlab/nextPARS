@@ -5,6 +5,7 @@ Here you will find the scripts necessary to produce the scores described in our 
 ### Install Prerequisites
 First install git:
 ```bash
+sudo apt-get update
 sudo apt-get install git-all
 ```
 
@@ -71,13 +72,15 @@ Example usage:
 ```bash
 # to produce an SPP file for the molecule TETp4p6
 python get_combined_score.py -i TETp4p6 -s
-# to produce a Varna-compatible output with the nextPARS scores for one of the randomly generated example molecules
-python get_combined_score.py -i test_37 -inDir nextPARS/data/PARSParser_outputs/test1 -f nextPARS/data/PARSParser_outputs/test1/test1.fasta -V nextPARS
+# to produce a Varna-compatible output with the nextPARS scores for one of the 
+# randomly generated example molecules
+python get_combined_score.py -i test_37 -inDir nextPARS/data/PARSParser_outputs/test1 \
+  -f nextPARS/data/PARSParser_outputs/test1/test1.fasta -V nextPARS
 ```
 
 
 
-# RNN classifier (already incorporated into the nextPARS scores above)
+### RNN classifier (already incorporated into the nextPARS scores above)
 To run the RNN classifier separately, using a different experimental score input (in .tab format), it can be run like so:
 
 ```bash

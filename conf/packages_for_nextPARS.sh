@@ -10,5 +10,5 @@ sudo apt-get -y install python-pip
 
 
 ## To install the required python packages
-pip install --user argparse numpy biopython datetime pysam termcolor pandas keras tensorflow dask h5py
+pip install --user argparse numpy biopython datetime pysam termcolor pandas keras tensorflow dask h5py default-jre
 
