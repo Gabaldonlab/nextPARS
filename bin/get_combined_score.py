@@ -46,7 +46,8 @@ def bp_nucs(calls, mol_seq):
 def pairs_from_ref_ct(molname):
     '''Create tuples of info about pairs from reference structure'''
     if molname == 'TETp4p6':
-        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s-PDB.ct' %(data,molname), 'r')
+        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s.ct' %(data,molname), 'r')
+#        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s-PDB.ct' %(data,molname), 'r')
     elif molname == 'SRA' or molname == 'B2' or molname == 'U1':
         ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s-ref.ct' %(data,molname), 'r')
     else:
@@ -317,20 +318,21 @@ def get_tabfilelist_nextPARS(molname, exp_dir=None):
         # in this case, exp_dir argument should be included and must be a directory containing tab files, so first must check:
         if os.path.isdir(exp_dir):
             for exp in sorted(os.listdir(exp_dir)):
-                with open('%s/%s' %(exp_dir, exp)) as opentab:
-                    for l in opentab:
-                        if molname in l:
-                            if "V1" in exp:
-                                V1_tabs.append(l)
-                                v_exps.append(exp)
-                            elif "S1" in exp:
-                                S1_tabs.append(l)
-                                s_exps.append(exp)
-                            else:
-                                print "The tab files should indicate which enzyme was used (V1/S1)"
-                                print "Please rename them accordingly"
-                                exit()
-                            break
+                if exp.endswith('.tab'):
+                    with open('%s/%s' %(exp_dir, exp)) as opentab:
+                        for l in opentab:
+                            if molname in l:
+                                if "V1" in exp:
+                                    V1_tabs.append(l)
+                                    v_exps.append(exp)
+                                elif "S1" in exp:
+                                    S1_tabs.append(l)
+                                    s_exps.append(exp)
+                                else:
+                                    print "The tab files should indicate which enzyme was used (V1/S1)"
+                                    print "Please rename them accordingly"
+                                    exit()
+                                break
             
             return V1_tabs, S1_tabs, molname, v_exps, s_exps, None # return None in place of hte variable real_path, which wont be used in this case
                 
@@ -408,65 +410,37 @@ def main():
     parser = argparse.ArgumentParser(description="Get combined scores from tab files.\n",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
-    parser.add_argument('-a', '--allthresh',
-                        dest = 'allthresh',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-a', '--allthresh', dest = 'allthresh', action = 'store', default = None,
                         help = "Generate files with calculations to plot with plot_method_differences.py.")
                         
-    parser.add_argument('-b', '--bpnucs',
-                        dest = 'bpnucs',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-b', '--bpnucs', dest = 'bpnucs', action = 'store_true', default = False,
                         help = "Determine the particular nucleotides in base pairs.")
     
-    parser.add_argument('-c', '--capto',
-                        dest = 'capto',
-                        action = 'store',
-                        type = int,
-                        default = 95,
+    parser.add_argument('-c', '--capto', dest = 'capto', action = 'store', type = int, default = 95,
                         help = "Cap to given percentile.")
     
-    parser.add_argument('-f', '--full',
-                        dest = 'full',
-                        action = 'store_false',
-                        default = True,
+    parser.add_argument('-f', '--fasta', dest = 'fasta', action = 'store', default = None,
+                        help = "Path to fasta file for input molecule.")
+    
+    parser.add_argument('--full', dest = 'full', action = 'store_false', default = True,
                         help = "Use full length of molecules and real calls for plots and calculations.")
                         
-    parser.add_argument('-i', '--input',
-                        dest = 'input',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-i', '--input', dest = 'input', action = 'store', default = None,
                         help = "Input molecule name (EX: TETp4p6)")
     
-    parser.add_argument('-inDir', '--inDir',
-                        dest = 'inDir',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-inDir', '--inDir', dest = 'inDir', action = 'store', default = None,
                         help = "Directory containing input files for the given molecule")
     
-    parser.add_argument('--ignore',
-                        dest = 'ignore',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('--ignore', dest = 'ignore', action = 'store_true', default = False,
                         help = "Ignore positions that are missing structural info or are part of pseudoknots.")
     
-    parser.add_argument('-k', '--knots',
-                        dest = 'knots',
-                        action = 'store',
-                        default = 'remove_none',
+    parser.add_argument('-k', '--knots', dest = 'knots', action = 'store', default = 'remove_none',
                         help = "Collect and remove positions in pseudoknots or without structure info.")
     
-    parser.add_argument('-l', '--last50',
-                        dest = 'last50',
-                        action = 'store_false',
-                        default = True,
+    parser.add_argument('-l', '--last50', dest = 'last50', action = 'store_false', default = True,
                         help = "Remove last 50 positions because reads not available.")
     
-    parser.add_argument('-m', '--misalign',
-                        dest = 'misalign',
-                        action = 'store_false',
-                        default = True,
+    parser.add_argument('-m', '--misalign', dest = 'misalign', action = 'store_false', default = True,
                         help = "Read alignment file and exclude positions that do not match.")
     #                    action = 'store',
     #                    type = int,
@@ -475,91 +449,49 @@ def main():
     #                    help = '''Remove positions that do not match reference in alignment. 
     #                        Indicate multiple positions by separating with a space ($ python ... -m 1 12 57)''')
     
-    parser.add_argument('-n', '--norm',
-                        dest = 'norm',
-                        action = 'store',
-                        default = 'D',
+    parser.add_argument('-n', '--norm', dest = 'norm', action = 'store', default = 'D',
                         help = "Normalization method.")
     
-    parser.add_argument('-nr', '--normreads',
-                        dest = 'normreads',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-nr', '--normreads', dest = 'normreads', action = 'store', default = None,
                         help = "Tab file of normalized S1 (-nr {s/s1}) or V1 (-nr {v/v1}) read counts.")
     
-    parser.add_argument('-o', '--output',
-                        dest = 'output',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('--nP_only', dest = 'nP_only', action = 'store', default = None,
+                        help = 'Output file with pre-RNN nextPARS scores in tab file format.')
+    
+    parser.add_argument('-o', '--output', dest = 'output', action = 'store', default = None,
                         help = 'Output file with scores in tab file format.')
     
-    parser.add_argument('-old', '--oldFileOrganization',
-                        dest = 'oldFileOrganization',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-old', '--oldFileOrganization', dest = 'oldFileOrganization', action = 'store_true', default = False,
                         help = 'Use old organization of files, in which each transcript is stored in a single file.')
     
-    parser.add_argument('-p', '--ppv',
-                        dest = 'ppv',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-p', '--ppv', dest = 'ppv', action = 'store', default = None,
                         help = "Perform ACC calculations and write to Excel file.")
     
-    parser.add_argument('-P', '--PARScalc',
-                        dest = 'PARScalc',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-P', '--PARScalc', dest = 'PARScalc',action = 'store_true', default = False,
                         help = "Calculate scores as in original PARS paper (using log2(V-S)).")
     
-    parser.add_argument('-r', '--removepos',
-                        dest = 'removepos',
-                        action = 'store',
-                        type = int,
-                        default = None,
+    parser.add_argument('-r', '--removepos', dest = 'removepos', action = 'store', type = int, default = None,
                         help = "Create lists of cor and inc to remove consistent inc.")
     
-    parser.add_argument('-s', '--spp',
-                        dest = 'spp',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-s', '--spp', dest = 'spp', action = 'store_true', default = False,
                         help = 'Generate Structure Prefernece Profile file.')
     
-    parser.add_argument('-ss', '--sppstats',
-                        dest = 'sppstats',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-ss', '--sppstats', dest = 'sppstats', action = 'store_true', default = False,
                         help = 'Output the stats about the spp files. ')
     
-    parser.add_argument('-t', '--thresh',
-                        dest = 'thresh',
-                        action = 'store',
-                        type = float,
-                        default = 0.8,
+    parser.add_argument('-t', '--thresh', dest = 'thresh', action = 'store', type = float, default = 0.8,
                         help = 'Threshold for strict calls.')
     
-    parser.add_argument('-T', '--threshvarna',
-                        dest = 'threshvarna',
-                        action = 'store',
-                        type = float,
-                        default = None,
+    parser.add_argument('-T', '--threshvarna', dest = 'threshvarna', action = 'store', type = float, default = None,
                         help = 'Threshold for Varna output.')
     
-    parser.add_argument('-v', '--verbose',
-                        dest = 'verbose',
-                        action = 'store_true',
-                        default = False,
+    parser.add_argument('-v', '--verbose', dest = 'verbose', action = 'store_true', default = False,
                         help = "Verbose.")
     
-    parser.add_argument('-V', '--varna',
-                        dest = 'varna',
-                        action = 'store',
-                        default = None,
-                        help = 'Create colormap file from scores values. {combined, spp, snorm, vnorm}')
+    parser.add_argument('-V', '--varna', dest = 'varna', action = 'store', default = '',
+                        help = 'Create colormap file from scores values. {nextPARS, spp, snorm, vnorm}')
     
-    parser.add_argument('-w', '--window',
-                        dest = 'window',
-                        action = 'store',
-                        default = None,
+    parser.add_argument('-w', '--window', dest = 'window', action = 'store', default = None,
                         help = "Summarize scores by average of windows around each position.")
     
     options = parser.parse_args()
@@ -571,7 +503,7 @@ def main():
 
     molname = options.input
     if options.inDir:
-        exp_dir = options.inDir.strip('/')
+        exp_dir = options.inDir.rstrip('/')
     
     ###############################
     #collect digestion data
@@ -605,7 +537,7 @@ def main():
         elif molname == 'RDN18-1':
             superstruc = '3U5F'
         elif molname == 'TETp4p6':
-            superstruc = 'TETp4p6-PDB'
+            superstruc = '1GID'
         else:
             superstruc = molname
             
@@ -709,15 +641,76 @@ def main():
 #        print colored('zer', 'red'), zer, len(zer)
         combined = combined_full
     
+    # to keep the nextPARS scores without incorporating the RNN score
+    pre_combined = combined
+        
+
+#################### Incorporate the RNN model to finalize the scores ##############################    
+    # First get fasta file for input molecule
+    try:
+        fas = "%s/SEQS/PROBES/%s.fa" %(data, molname)
+        fas_temp = "%s_tmp" %fas
+        fo = open(fas)
+        fo.close()
+        os.system("cp %s %s" %(fas, fas_temp))
+    except IOError:
+        fas = options.fasta
+        fas_temp = "%s_tmp" %fas
+        fo = open(fas)
+        fw = open(fas_temp, "w")
+        
+        seq = ''
+        for line in fo:
+            l = line.strip()
+            if l.startswith(">"):
+                name = l.split(">")[1] 
+            if name == molname and not l.startswith(">"):
+                seq += l
+        fw.write(">%s\n" %molname)
+        fw.write(seq)
+        
+        fo.close()
+        fw.close()
+    
+    # then get file with initial nextPARS scores
+    score_tab = []
+    for a in combined:
+        #this is to avoid problems with exponentials => very low order values become 0
+        if a<=0.0001 and a>=0.0:
+            a=0.0
+        elif a>=-0.0001 and a<=0.0:
+            a=0.0
+        score_tab.append(str(a))
+    score_tab = '%s\t%s;' %(molname, ';'.join(score_tab))
+#        print score_tab
+    out = open("%s.tmp.out" %molname, 'w')
+    out.write(score_tab)      ##Creates file with scores in tab format
+    out.close()
+    
+    # Finally, run the RNN model calculation of scores
+    os.system("python predict2.py -f %s -p %s.tmp.out -o %s.RNN.tab_tmp 2> /dev/null" %(fas_temp, molname, molname))
+    os.system("rm %s.tmp.out" %molname)
+    os.system("rm %s" %fas_temp)
+    
+    # Now can use those scores as the combined scores
+    rnn = open("%s.RNN.tab_tmp" %molname)
+    rnn_write = open("%s.RNN.tab" %molname, "w")
+    combined = [ float(x) for x in rnn.readline().split()[-1].rstrip(';').split(';') ]
+    combined_norm = tsl.norm_pos_neg(combined)
+    combined=combined_norm
+    rnn_write.write("%s\t%s;" %(molname, ';'.join([str(x) for x in combined])))
+    rnn.close()
+    rnn_write.close()
+    os.system("rm %s.RNN.tab_tmp" %molname)
+    
+    
     if options.verbose:
         print
         print '%s V1 files and %s S1 files included' %(colored(str(included_v),'cyan'), colored(str(included_s),'cyan'))
         print colored("Combined", 'green'), combined, colored(len(combined), 'cyan')
         if full_ref_seq != "all_indices": #since these values will all be 0s because no CT file was available
             print colored("Real Calls", 'green'), real_calls, colored(len(real_calls), 'cyan')
-        
-        
-        
+            
         
 #################### Strict calls and percentages ##############################
     if options.allthresh:   #For use with the script plot_best.py
@@ -905,11 +898,26 @@ def main():
         out.write(score_tab)      ##Creates file with scores in tab format
         out.close()
     
+    elif options.nP_only:
+        score_tab = []
+        for a in pre_combined:
+            #this is to avoid problems with exponentials => very low order values become 0
+            if a<=0.0001 and a>=0.0:
+                a=0.0
+            elif a>=-0.0001 and a<=0.0:
+                a=0.0
+            score_tab.append(str(a))
+        score_tab = '%s\t%s;' %(molname_full, ';'.join(score_tab))
+#        print score_tab
+        out = open(options.nP_only, 'w')
+        out.write(score_tab)      ##Creates file with scores in tab format
+        out.close()
+    
     elif options.normreads:
-        if options.normreads in ['s','s1','S','S1']:
+        if options.normreads.upper() in ['S','S1']:
             enz_norm = S_norm
             enz = 'S1'
-        elif options.normreads in ['v','v1','V','V1']:
+        elif options.normreads.upper() in ['V','V1']:
             enz_norm = V_norm
             enz = 'V1'
         enz_norm = [str(round(x,4)) for x in enz_norm]
@@ -920,9 +928,9 @@ def main():
         tsl.colormap('%s/%s_%s_norm_reads.colormap' %(src, molname, enz), enz_norm, threshold=None)
     
     ##Create file with scores in colormap format
-    if options.varna in ['c','C','combined','Combined']:
-        tsl.colormap('%s/%s_combined.colormap' %(src,molname), combined, options.threshvarna)
-    elif options.varna in ['s','S','spp','SPP']:
+    if options.varna.upper() in ['C','COMBINED','NEXTPARS']:
+        tsl.colormap('%s/%s_nextPARS.colormap' %(src,molname), combined, options.threshvarna)
+    elif options.varna.upper() in ['S','SPP']:
         score_tab=[]
         append_st = score_tab.append
         for c in strict_calls:
@@ -935,10 +943,10 @@ def main():
             append_st(str(s))
         print score_tab, molname
         tsl.colormap('%s/%s_spp.colormap' %(src,molname), score_tab, options.threshvarna)
-    elif options.varna in ['snorm','sn','SN','Snorm','S_norm','s1','S1']:
+    elif options.varna.upper() in ['SNORM','SN','S_NORM','S1']:
         enz_norm = [str(round(x,4)) for x in S_norm]
         tsl.colormap('%s/%s_S1_norm_reads.colormap' %(src,molname), enz_norm, threshold=None)
-    elif options.varna in ['vnorm','vn','VN','Vnorm','V_norm','v1','V1']:
+    elif options.varna.upper() in ['VNORM','VN','V_NORM','V1']:
         enz_norm = [str(round(x,4)) for x in V_norm]
         tsl.colormap('%s/%s_V1_norm_reads.colormap' %(src,molname), enz_norm, threshold=None)
     

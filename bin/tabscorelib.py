@@ -23,7 +23,7 @@ def get_real_calls(molname):
     
 #    ct_path = '%s/tgabaldon/PROJECTS/NONCODEVOL/DATA/STRUCTURES/REFERENCE_STRUCTURES/' %home
     ct_path = '%s/STRUCTURES/REFERENCE_STRUCTURES/' %data
-    if molname in ['TETp4p6', 'RDN18-1']:
+    if molname in ['RDN18-1']:
         ct = open(ct_path+molname.replace('-1','')+'-PDB.ct', 'r') #replace since file called RDN18-PDB in folder
     elif molname in ['B2', 'U1', 'SRA']:
         ct = open(ct_path+molname+'-ref.ct', 'r')
@@ -106,7 +106,7 @@ def get_dot_string(molname):
     elif molname == 'RDN18-1':
         dp_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/3U5F.dp' %data, 'r')
     elif molname == 'TETp4p6':
-        dp_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/TETp4p6-PDB.dp' %data, 'r')
+        dp_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/TETp4p6.dp' %data, 'r')
     else:
         dp_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s.dp' %(data,molname), 'r')
         
@@ -126,7 +126,7 @@ def get_dot_string(molname):
     elif molname == 'RDN58-1':
         dot_seq = seq[3517:]
     elif molname == 'TETp4p6':
-        dot_seq = seq[0:157]
+        dot_seq = seq[0:158]
     else:
         dot_seq = seq
     return dot_seq
@@ -139,7 +139,8 @@ def get_external_knots(molname):
     elif molname == 'RDN18-1':
         ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/3U5F.ct' %data, 'r')
     elif molname == 'TETp4p6':
-        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/TETp4p6-PDB.ct' %data, 'r')
+        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/TETp4p6.ct' %data, 'r')
+#        ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/TETp4p6-PDB.ct' %data, 'r')
     else:
         ct_file = open('%s/STRUCTURES/REFERENCE_STRUCTURES/%s.ct' %(data,molname), 'r')
         
@@ -161,7 +162,7 @@ def get_external_knots(molname):
                 if line[0]-line[5] == 3517:
                     append_cts((line[0], line[4], line[5]))
             elif molname == 'TETp4p6':
-                if line[0] <= 157:
+                if line[0] <= 158:
                     append_cts((line[0], line[4], line[5]))
             else:
                 append_cts((line[0], line[4], line[5]))
