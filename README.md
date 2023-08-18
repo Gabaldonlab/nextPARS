@@ -1,4 +1,6 @@
 # nextPARS, a novel Illumina-based implementation of in-vitro parallel probing of RNA structures.
+![Docker Pulls](https://img.shields.io/docker/pulls/cgenomics/nextpars)
+[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://hub.docker.com/repository/docker/cgenomics/nextpars)
 
 Here you will find the scripts necessary to produce the scores described in our paper from fastq files obtained during the experiment.
 
